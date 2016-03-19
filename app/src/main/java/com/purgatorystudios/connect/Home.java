@@ -19,6 +19,9 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+/*
+TODO: add intent/activity for the logged in users.
+ */
 public class Home extends AppCompatActivity {
 
     private TextView status,role,method, lblOnlineUsers;

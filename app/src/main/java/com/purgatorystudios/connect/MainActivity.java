@@ -15,10 +15,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 /*
-TODO:
-Get seperate main menu for home/main
-change login to be an updated bool in users
-polling
+
 
  */
 public class MainActivity extends AppCompatActivity {
@@ -42,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this,Home.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
+            //
 
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
