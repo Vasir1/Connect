@@ -45,6 +45,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.purgatorystudios.connect.Home" />
         </activity>
+        <activity android:name=".sendMessage"></activity>
     </application>
 
 </manifest>
