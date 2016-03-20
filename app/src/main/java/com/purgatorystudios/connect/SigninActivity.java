@@ -123,9 +123,47 @@ public class SigninActivity  extends AsyncTask<String,Void,String> {
                 if (reader.readLine().equals("success <br />")){
                     loggedIn=true;
                     Log.w("test","logged in! string parsed"+loggedIn);
+                    //return "welcome";
+
+
+                    //Log.w("test", reader.readLine());
+                    String patternRegex = "(?i)<br */?>";
+                    settings = context.getSharedPreferences("MyPreferencesFileName", 0);
+                    SharedPreferences.Editor preferencesEditor = settings.edit();
+                    preferencesEditor.putBoolean("loggedIn", true); //
+                    preferencesEditor.putString("email", email);
+                    preferencesEditor.commit();
+                    //int n=Integer.parseInt(reader.readLine());
+                    //Log.w("test", "logged in! seeing if broken");
+                    String name = reader.readLine().replaceAll(patternRegex, " ");
+                    String lines[] = name.split(" ");
+                    Log.w("test", "name:" + lines[0]);
+                    Log.w("test", "id:" + lines[1]);
+                    //Reading a line from my server, replacing <br> with \n, parsing to int
+                    //int id= Integer.parseInt(reader.readLine().replaceAll(patternRegex, "\n"));
+
+                    //int id;
+                    try {
+                      //  id = ]);
+                        preferencesEditor.putInt("id", Integer.parseInt(lines[1]));
+                        preferencesEditor.commit();
+                    }
+                    catch (NumberFormatException e) {
+                        Log.w("test",e.toString());
+                    }
+                    //Log.w("test", "id:" + id);
+                    name=lines[0];
+                    //Log.w("test", "trying to get ID from DB: " + id);
+                    Log.w("test","name: "+name);
+                    // preferencesEditor.putInt("dbID",Integer.parseInt(reader.readLine()));
+                   // preferencesEditor.putInt("id", id);
+                   // Log.w("test", id + "ID in Signin");
+                   // preferencesEditor.commit();
+
+                    return name;
                 }
-                //Log.w("test", reader.readLine());
-                return reader.readLine();
+                return null;
+
                 //return sb.toString();
             } catch (Exception e) {
                 return new String("Exception: " + e.getMessage());
@@ -140,14 +178,11 @@ public class SigninActivity  extends AsyncTask<String,Void,String> {
     protected void onPostExecute(String result){
         if (loggedIn==false)
             return;
+        Log.w("test","result: "+result);
         this.statusField.setText("Login Successful");
         this.roleField.setText(result);
 
-        settings = context.getSharedPreferences("MyPreferencesFileName", 0);
-        SharedPreferences.Editor preferencesEditor = settings.edit();
-        preferencesEditor.putBoolean("loggedIn", true); //
-        preferencesEditor.putString("email",email);
-        preferencesEditor.commit();
+
 
 
 /*

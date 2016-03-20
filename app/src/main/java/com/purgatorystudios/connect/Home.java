@@ -54,6 +54,7 @@ public class Home extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        Log.w("DBD",settings.getInt("id",0)+" ID in Home");
 
 
 
@@ -124,6 +125,7 @@ public class Home extends AppCompatActivity {
         lblOnlineUsers.setText(sb.toString());
         Log.w("test","label set in MAIN!");
 
+
         //lblStaticOnline.setText(sb.toString());
         //testToPrivate();
 
@@ -134,8 +136,36 @@ public class Home extends AppCompatActivity {
             public void onClick(View v) {
                 button.setText(button.getTag().toString());
                 Log.w("test", "clicked");
+                classUser temp=getUserWithID(Integer.parseInt(button.getTag().toString()));
+                openChat(temp);
+
+
             }
         };
+    }
+
+    public classUser getUserWithID(int _temp){
+        for (int i=0;i<=usersOnline.length;i++){
+            if (usersOnline[i].id==_temp){
+                return usersOnline[i];
+            }
+
+
+        }
+        return null;
+
+    }
+
+    public void openChat(classUser _userToTalkTo){
+        Intent intent = new Intent(this,Conversation.class);
+       // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        Bundle b = new Bundle();
+        b.putInt("id", _userToTalkTo.id); //Your id
+        b.putString("name", _userToTalkTo.name);
+
+        intent.putExtras(b); //Put your id to your next Intent
+        startActivity(intent);
+
     }
 
 

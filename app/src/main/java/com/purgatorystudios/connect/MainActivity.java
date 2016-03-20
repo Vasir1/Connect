@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         settings = getSharedPreferences("MyPreferencesFileName", 0);
         //If we have saved to the phone that we're logged in we can jump right to home!
         if (settings.getBoolean("loggedIn",false)) {
+            Log.w("test2","MainActivity thinks you're not logged in.");
             Intent intent = new Intent(this,Home.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

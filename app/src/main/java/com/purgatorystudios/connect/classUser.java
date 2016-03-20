@@ -15,4 +15,7 @@ public class classUser {
     public  classUser(){
 
     }
+    public  classUser(int _id){
+
+    }
 }
