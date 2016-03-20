@@ -134,7 +134,7 @@ public class Home extends AppCompatActivity {
     View.OnClickListener getOnClickDoSomething(final Button button)  {
         return new View.OnClickListener() {
             public void onClick(View v) {
-                button.setText(button.getTag().toString());
+                //button.setText(button.getTag().toString());
                 Log.w("test", "clicked");
                 classUser temp=getUserWithID(Integer.parseInt(button.getTag().toString()));
                 openChat(temp);
