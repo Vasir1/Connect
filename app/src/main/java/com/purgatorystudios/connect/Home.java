@@ -3,9 +3,12 @@ package com.purgatorystudios.connect;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -31,9 +34,16 @@ public class Home extends AppCompatActivity {
 
     classUser[] usersOnline;
 
+    private Handler mHandler = new Handler();
+    int timeForNext;
+    Context context;
+    public  boolean notificationPending=true;
+    public boolean appOpen=true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context=this;
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -54,15 +64,18 @@ public class Home extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        Log.w("DBD",settings.getInt("id",0)+" ID in Home");
+        Log.w("DBD", settings.getInt("id", 0) + " ID in Home");
 
 
 
         new webCheckOnline(this,Home.this,lblOnlineUsers).execute(settings.getString("email", ""));
 
-        Log.w("test",usersOnline.length+" users currently online.");
+        Log.w("test", usersOnline.length + " users currently online.");
 
         //lblOnlineUsers.setText("this works?");
+        mHandler.removeCallbacks(mUpdateTimeTask);
+        timeForNext=1000;
+        mHandler.postDelayed(mUpdateTimeTask, 100);
 
     }
     public static void myReturn(classUser _temp, int _index){
@@ -225,6 +238,104 @@ public class Home extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private Runnable mUpdateTimeTask = new Runnable() {
+        public void run() {
+
+
+
+
+            new pollForUnreadThreads(context,Home.this,settings.getInt("id", 0)).execute(settings.getString("email", ""));
+
+            mHandler.postDelayed(mUpdateTimeTask, timeForNext);
+
+
+        }
+    };
+    public void Reset(){
+        for (int i=0;i<usersOnline.length;i++){
+            Button tempButton = (Button) findViewById(usersOnline[i].viewID);
+
+            tempButton.setBackgroundColor(Color.WHITE);
+            tempButton.setTextColor(Color.BLACK);
+        }
+
+    }
+
+    public void displayNotification(String _result){
+
+        if (!appOpen) {
+            Log.w("DBD", "notification found!(calling from Home)");
+            //It is set back to false on pause
+
+            Intent notifyIntent = new Intent(context, Home.class);
+            notifyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            Notification.Builder builder = new Notification.Builder(Home.this);
+
+
+            builder.setAutoCancel(true);
+            builder.setTicker("this is ticker text");
+            builder.setContentTitle("New message");
+            builder.setContentText("You have a new message");
+            builder.setSmallIcon(R.drawable.lightbulb);
+            builder.setContentIntent(pendingIntent);
+            builder.setOngoing(false);
+            // builder.setSubText("This is subtext...");   //API level 16
+            builder.setNumber(1);
+            builder.build();
+
+            myNotication = builder.getNotification();
+            manager.notify(11, myNotication);
+            notificationPending = true;
+            //mHandler.postDelayed(mUpdateTimeTask, timeForNext);
+        }
+        else {
+           //
+
+            String lines[] = _result.split("\\r?\\n");
+
+            for (int i=0;i<lines.length;i++) {
+                classUser temp = getUserWithID(Integer.parseInt(lines[i]));
+                Button tempButton = (Button) findViewById(temp.viewID);
+                tempButton.setBackgroundColor(Color.RED);
+                tempButton.setTextColor(Color.WHITE);
+            }
+
+        }
+        mHandler.postDelayed(mUpdateTimeTask, timeForNext);
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i("test", "onPause");
+        mHandler.removeCallbacks(mUpdateTimeTask);
+        timeForNext=10000;
+        notificationPending=false;
+        appOpen=false;
+       // mHandler.postDelayed(mUpdateTimeTask, 10000);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i("test", "onStop");
+        mHandler.removeCallbacks(mUpdateTimeTask);
+        timeForNext=10000;
+        notificationPending=false;
+        appOpen=false;
+        //mHandler.postDelayed(mUpdateTimeTask, 10000);
+    }
+
+    protected void onResume() {
+        super.onResume();
+        Log.i("test", "onResume");
+        appOpen=true;
     }
 
 }

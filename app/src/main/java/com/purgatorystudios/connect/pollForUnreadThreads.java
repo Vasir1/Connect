@@ -13,24 +13,22 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 
-public class pollForMessages extends AsyncTask<String,Void,String> {
+public class pollForUnreadThreads extends AsyncTask<String,Void,String> {
 
     Context context;
-    Conversation conversation;
+    Home home;
     int to, from;
     String message;
     boolean success=false;
-    boolean getOld=false; //may be able to remove this...yeah probly best
 
-    public pollForMessages(Context _context, Conversation _conversation, int _yourID, int _theirID, boolean _getOld) {
+    public pollForUnreadThreads(Context _context, Home _home, int _yourID) {
         //Log.w("DBD", "Made it to polling!");
         context=_context;
-        conversation=_conversation;
+        home=_home;
         to=_yourID;
-        from=_theirID;
-        getOld=_getOld;
-        Log.w("DBD",to+" - "+from);
-        Log.w("DBDB","getOld- "+getOld);
+        //from=_theirID;
+       // notifications=_notifications;
+       // Log.w("DBD",to+" - "+from);
 
 
         // message=_message;
@@ -39,20 +37,15 @@ public class pollForMessages extends AsyncTask<String,Void,String> {
     @Override
     protected String doInBackground(String... arg0) {
 
-        //Log.w("test", "Checking who is online!");
+        Log.w("test", "Seeing if there's unopened conversations!");
         try {
             //String username = (String) arg0[0];
             //Log.w("test", "username: "+username);
             //String password = (String) arg0[1];
 
-
-            String link = "http://kylepfef.com/Secrets/androidCheckForUnread.php";
+            String link = "http://kylepfef.com/Secrets/androidCheckForAllUnread.php";
             String data = URLEncoder.encode("to", "UTF-8") + "=" + URLEncoder.encode(String.valueOf(to), "UTF-8");
-            data += "&" + URLEncoder.encode("from", "UTF-8") + "=" + URLEncoder.encode(String.valueOf(from), "UTF-8");
-            if (getOld==true)
-                data += "&" + URLEncoder.encode("getOld", "UTF-8") + "=" + URLEncoder.encode("true", "UTF-8");
-            else
-                data += "&" + URLEncoder.encode("getOld", "UTF-8") + "=" + URLEncoder.encode("false", "UTF-8");
+           // data += "&" + URLEncoder.encode("from", "UTF-8") + "=" + URLEncoder.encode(String.valueOf(from), "UTF-8");
             //data += "&" + URLEncoder.encode("message", "UTF-8") + "=" + URLEncoder.encode(message, "UTF-8");
 
             URL url = new URL(link);
@@ -74,30 +67,54 @@ public class pollForMessages extends AsyncTask<String,Void,String> {
             String patternRegex = "(?i)<br */?>";
             //String titleNameRegex = result.replaceAll(patternRegex, "\n");
             while ((line = reader.readLine()) != null) {
+                if (line.equals("null")){
+                    success=false;
+                    sb.append("null");
+                    continue;
 
-                line=line.replaceAll(patternRegex, "\n");
-                Log.w("DBD", line.toString());
-                sb.append(line);
+                }
+
+                //Log.w("DBDPolling", line.toString());
+                //sb.append(line);
                 //if (line.equals("success")){
 
 
 
-               // }
-                //
+                // }
+                 line=line.replaceAll(patternRegex, "\n");
 
+                String lines[] = line.split("\\r?\\n");
+
+                for (int i=0;i<lines.length;i++){
+                    sb.append(lines[i]+"\n");
+                    //buil
+                    //build the loop to accumulate into stringbuilder
+
+                }
+
+                success=true;
                 //return "errr";
+                Log.w("DBDPolling","Unread ID: "+sb.toString());
 
 
             }
 
-            Log.w("DBD",sb.toString());
+
+            //Log.w("DBD",sb.toString());
+            /*
             if (sb.toString()!=null){
+                try {
+                    int n = Integer.parseInt(sb.toString());
+                } catch (NumberFormatException e) {
+                    //error
+                }
                 success=true;
             }
             if(sb.toString().isEmpty()){
                 Log.w("DBD","empty");
                 success=false;
-            }
+            }*/
+
             return sb.toString();
             //return "error, line is null ";
         } catch (Exception e) {
@@ -112,8 +129,9 @@ public class pollForMessages extends AsyncTask<String,Void,String> {
     @Override
     protected void onPostExecute(String result){
 
+        home.Reset();
         if(success)
-            conversation.updateReceivedText(result);
+            home.displayNotification(result);
 
     }
 

@@ -32,6 +32,8 @@ public class Conversation extends AppCompatActivity {
     Context context;
     int timeForNext;
     boolean notifications=false;
+
+
     NotificationManager manager;
     Notification myNotication;
 
@@ -68,7 +70,8 @@ public class Conversation extends AppCompatActivity {
         mStartTime = System.currentTimeMillis();
         mHandler.removeCallbacks(mUpdateTimeTask);
         timeForNext=1000;
-        mHandler.postDelayed(mUpdateTimeTask, 100);
+        new pollForMessages(context,Conversation.this,settings.getInt("id", 0), id, true).execute(settings.getString("email", ""));
+        mHandler.postDelayed(mUpdateTimeTask, 400);
     }
     public void submit(View view){
         Log.w("DBD", text.getText().toString());
@@ -85,7 +88,7 @@ public class Conversation extends AppCompatActivity {
     }
     public void updateText(String _text){
 
-        sbDisplayedText.append(_text + "\n");
+        sbDisplayedText.append("You: "+_text + "\n");
         tvChat.setText(sbDisplayedText.toString());
         text.setText("");
     }
@@ -113,7 +116,8 @@ public class Conversation extends AppCompatActivity {
             manager.notify(11, myNotication);
         }
 
-        sbDisplayedText.append(name + ": " + _text + "\n");
+        //name + ": " + 
+        sbDisplayedText.append(_text + "\n");
         tvChat.setText(sbDisplayedText.toString());
     }
 
@@ -129,10 +133,11 @@ public class Conversation extends AppCompatActivity {
 
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
+            //return;
             //Log.w("DBD","loop");
 
             //this context, this activity, YOUR id
-            new pollForMessages(context,Conversation.this,settings.getInt("id", 0), id, notifications).execute(settings.getString("email", ""));
+            new pollForMessages(context,Conversation.this,settings.getInt("id", 0), id, false).execute(settings.getString("email", ""));
 
             /*
             final long start = mStartTime;
@@ -157,6 +162,14 @@ public class Conversation extends AppCompatActivity {
     };
 
     @Override
+    public void onBackPressed(){
+        Log.i("test", "onBackPressed");
+        mHandler.removeCallbacks(mUpdateTimeTask);
+        super.onBackPressed();
+
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         Log.i("test", "onPause");
@@ -164,6 +177,11 @@ public class Conversation extends AppCompatActivity {
         timeForNext=10000;
         notifications=true;
         mHandler.postDelayed(mUpdateTimeTask, 10000);
+    }
+    protected void onResume() {
+        super.onResume();
+        Log.i("test", "onResume");
+        notifications=false;
     }
 
     @Override
@@ -173,7 +191,7 @@ public class Conversation extends AppCompatActivity {
         mHandler.removeCallbacks(mUpdateTimeTask);
         timeForNext=10000;
         notifications=true;
-        mHandler.postDelayed(mUpdateTimeTask, 10000);
+       // mHandler.postDelayed(mUpdateTimeTask, 10000);
     }
 
 }

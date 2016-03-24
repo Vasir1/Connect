@@ -46,7 +46,8 @@
                 android:value="com.purgatorystudios.connect.Home" />
         </activity>
         <activity android:name=".sendMessage" />
-        <activity android:name=".pollForMessages"></activity>
+        <activity android:name=".pollForMessages" />
+        <activity android:name=".pollForUnreadThreads"></activity>
     </application>
 
 </manifest>
