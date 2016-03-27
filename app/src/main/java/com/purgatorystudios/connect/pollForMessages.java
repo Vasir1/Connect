@@ -77,6 +77,18 @@ public class pollForMessages extends AsyncTask<String,Void,String> {
 
                 line=line.replaceAll(patternRegex, "\n");
                 Log.w("DBD", line.toString());
+               /* if (getOld){
+                    String lines[] = line.split("\\r?\\n");
+                    Log.w("DBD", "lines: "+lines.length);
+                    for (int i=lines.length;i>0;i--) {
+                        Log.w("DBD", "in loop: "+lines[i]);
+                        sb.append(lines[i]);
+                    }
+                }
+                else {
+
+                    sb.append(line);
+                }*/
                 sb.append(line);
                 //if (line.equals("success")){
 
@@ -90,7 +102,7 @@ public class pollForMessages extends AsyncTask<String,Void,String> {
 
             }
 
-            Log.w("DBD",sb.toString());
+            Log.w("DBD", sb.toString());
             if (sb.toString()!=null){
                 success=true;
             }

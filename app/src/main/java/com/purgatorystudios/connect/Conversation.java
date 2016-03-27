@@ -74,7 +74,7 @@ public class Conversation extends AppCompatActivity {
         mHandler.postDelayed(mUpdateTimeTask, 400);
     }
     public void submit(View view){
-        Log.w("DBD", text.getText().toString());
+       // Log.w("DBD", text.getText().toString());
         String _temp=text.getText().toString();
         Log.w("DBD",_temp);
         /*sbDisplayedText.append(text.getText().toString() + "\n");
